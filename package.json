@@ -6,11 +6,19 @@
     "start": "next start"
   },
   "dependencies": {
+    "axios": "^1.6.8",
+    "cors": "^2.8.5",
+    "http-proxy": "^1.18.1",
     "next": "latest",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.30",
+    "@types/react": "18.2.69",
+    "typescript": "5.4.3"
   }
 }

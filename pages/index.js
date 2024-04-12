@@ -1,131 +1,121 @@
-import Head from 'next/head';
-import styles from '../styles/Home.module.css';
+import React, { useState, useEffect } from 'react';
+import Layout from '../components/Layout';
 
-export default function Home() {
+export default function EntityTable() {
+  const [employeeData, setEmployeeData] = useState(null);
+  const [departmentData, setDepartmentData] = useState(null);
+  const [projectData, setProjectData] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [reloadAttempts, setReloadAttempts] = useState(0);
+
+  useEffect(() => {
+    fetchData('employee');
+    fetchData('department');
+    fetchData('project');
+  }, []);
+
+  const fetchData = async (entityType) => {
+    try {
+      let endpoint;
+      switch (entityType) {
+        case 'employee':
+          endpoint = '/api/employee';
+          break;
+        case 'department':
+          endpoint = '/api/department';
+          break;
+        case 'project':
+          endpoint = '/api/project';
+          break;
+        default:
+          throw new Error('Invalid entity type');
+      }
+      const response = await fetch(endpoint);
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+      const result = await response.json();
+      if (entityType === 'employee') {
+        setEmployeeData(result);
+      } else if (entityType === 'department') {
+        setDepartmentData(result);
+      } else if (entityType === 'project') {
+        setProjectData(result);
+      }
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    if (reloadAttempts < 5) {
+      setTimeout(() => {
+        window.location.reload();
+        setReloadAttempts(reloadAttempts + 1);
+      }, 1000);
+      return <div>Error: Reloading page... Retry attempt {reloadAttempts + 1}</div>;
+    } else {
+      return <div>Error: Unable to load data after multiple attempts.</div>;
+    }
+  }
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <div>
+      <Layout />
+      <h1>Report</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Employee ID</th>
+            <th>Employee Name</th>
+            <th>Employee Title</th>
+            <th>Employee's Home Department ID</th>
+            <th>Department Name</th>
+            <th>Department Manager ID</th>
+            <th>Department Manager Name</th>
+            <th>Project ID Where Employee's Department Is The Sponsor</th> 
+            <th>Project Name</th>
+            <th>Project Start Date</th>
+            <th>Project End Date</th>
+            <th>Project Budget</th>
+          </tr>
+        </thead>
+        <tbody>
+          {employeeData && employeeData.map(employee => (
+            <tr key={employee.id}>
+              <td>{employee.id}</td>
+              <td>{employee.name}</td>
+              <td>{employee.title}</td>
+              <td>{employee.home_dept}</td>
+              {/* Find department details for the employee */}
+              {departmentData && departmentData.find(department => department.id === employee.home_dept) && (
+                <>
+                  <td>{departmentData.find(department => department.id === employee.home_dept).name}</td>
+                  <td>{departmentData.find(department => department.id === employee.home_dept).manager}</td>
+                  {/* Find project details for the department */}
+                  {projectData && projectData.find(project => project.sponsor === employee.home_dept) && (
+                    <>
+                      <td>{projectData.find(project => project.sponsor === employee.home_dept).id}</td>
+                      <td>{projectData.find(project => project.sponsor === employee.home_dept).name}</td>
+                      <td>{projectData.find(project => project.sponsor === employee.home_dept).start_date}</td>
+                      <td>{projectData.find(project => project.sponsor === employee.home_dept).end_date}</td>
+                      <td>{projectData.find(project => project.sponsor === employee.home_dept).budget}</td>
+                    </>
+                  )}
+                </>
+              )}
+            </tr>
+          ))}
+        </tbody>
 
-      <main>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing <code>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel" className={styles.logo} />
-        </a>
-      </footer>
-
-      <style jsx>{`
-        main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
-        footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        footer img {
-          margin-left: 0.5rem;
-        }
-        footer a {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          text-decoration: none;
-          color: inherit;
-        }
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family:
-            Menlo,
-            Monaco,
-            Lucida Console,
-            Liberation Mono,
-            DejaVu Sans Mono,
-            Bitstream Vera Sans Mono,
-            Courier New,
-            monospace;
-        }
-      `}</style>
-
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family:
-            -apple-system,
-            BlinkMacSystemFont,
-            Segoe UI,
-            Roboto,
-            Oxygen,
-            Ubuntu,
-            Cantarell,
-            Fira Sans,
-            Droid Sans,
-            Helvetica Neue,
-            sans-serif;
-        }
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
+      </table>
     </div>
   );
 }
