@@ -1,5 +1,3 @@
-import Head from 'next/head';
-import styles from '../styles/Home.module.css';
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 
@@ -116,7 +114,7 @@ export default function Home() {
   }
 
   return (
-    <div className={styles.container}>
+    <div>
       <Layout />
       <h1>Project Table</h1>
       <table>
@@ -136,8 +134,8 @@ export default function Home() {
             <tr key={item.id}>
               <td>{item.id}</td> {/* ID field is not editable */}
               <td>{editedItem && editedItem.id === item.id ? <input value={editedItem.name} onChange={e => setEditedItem({...editedItem, name: e.target.value})}/> : item.name}</td>
-              <td>{editedItem && editedItem.id === item.id ? <input value={editedItem.startDate} onChange={e => setEditedItem({...editedItem, startDate: e.target.value})}/> : item.startDate}</td>
-              <td>{editedItem && editedItem.id === item.id ? <input value={editedItem.endDate} onChange={e => setEditedItem({...editedItem, endDate: e.target.value})}/> : item.endDate}</td>
+              <td>{editedItem && editedItem.id === item.id ? <input type="date" value={editedItem.startDate} onChange={e => setEditedItem({...editedItem, startDate: e.target.value})}/> : item.startDate}</td>
+              <td>{editedItem && editedItem.id === item.id ? <input type="date" value={editedItem.endDate} onChange={e => setEditedItem({...editedItem, endDate: e.target.value})}/> : item.endDate}</td>
               <td>{editedItem && editedItem.id === item.id ? <input value={editedItem.budget} onChange={e => setEditedItem({...editedItem, budget: e.target.value})}/> : item.budget}</td>
               <td>{editedItem && editedItem.id === item.id ? <input value={editedItem.sponsor} onChange={e => setEditedItem({...editedItem, sponsor: e.target.value})}/> : item.sponsor}</td>
               <td>
@@ -158,8 +156,8 @@ export default function Home() {
           <tr>
             <td>Auto-generated</td> {/* ID field for new item */}
             <td><input value={newItem.name} onChange={e => setNewItem({...newItem, name: e.target.value})}/></td>
-            <td><input value={newItem.startDate} onChange={e => setNewItem({...newItem, startDate: e.target.value})}/></td>
-            <td><input value={newItem.endDate} onChange={e => setNewItem({...newItem, endDate: e.target.value})}/></td>
+            <td><input type="date" value={newItem.startDate} onChange={e => setNewItem({...newItem, startDate: e.target.value})}/></td>
+            <td><input type="date" value={newItem.endDate} onChange={e => setNewItem({...newItem, endDate: e.target.value})}/></td>
             <td><input value={newItem.budget} onChange={e => setNewItem({...newItem, budget: e.target.value})}/></td>
             <td><input value={newItem.sponsor} onChange={e => setNewItem({...newItem, sponsor: e.target.value})}/></td>
             <td>
